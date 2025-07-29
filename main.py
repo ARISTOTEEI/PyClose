@@ -1,4 +1,3 @@
-def func():
-    func()
-    print("Hello world")
-func()
+from app.client import CloseBot
+
+CloseBot().launch()

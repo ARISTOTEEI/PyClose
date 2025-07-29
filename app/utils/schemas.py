@@ -2,7 +2,7 @@ from sqlalchemy import Identity,ForeignKey,BigInteger
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import mapped_column,Mapped
 from datetime import datetime,timezone
-from utils.database import Base
+from database import Base
 from enum import Enum
 
 class CloseType(str,Enum):
