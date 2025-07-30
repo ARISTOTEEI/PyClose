@@ -1,11 +1,12 @@
 import disnake as dis
 from disnake.ext.commands import Cog, Param, InteractionBot
 from disnake.ext import commands
-from ..config import roles
-from ..closemanager import Close
+from disnake import PermissionOverwrite
+from ..client import CloseBot
+from ..closemanager import CloseSource
 
 class CloseCommand(Cog):
-    def __init__(self,bot:InteractionBot) -> None:
+    def __init__(self,bot:CloseBot) -> None:
         self.bot = bot
         super().__init__()
 
@@ -14,18 +15,39 @@ class CloseCommand(Cog):
         if not(inter.guild):
             await inter.response.send_message("Не используйте в личных сообщениях",ephemeral=True)
             return
-        closemod = inter.guild.get_role(roles.get("closemod"))
+        closemod = inter.guild.get_role(self.bot.settings.roles.closemod)
+        
         if closemod not in inter.author.roles:
             await inter.response.send_message("У вас нету роли клозмейкера",ephemeral=True)
             return
         
-        close = Close()
-
-        # await close.create_close()
-        
-        if not(close.status):
-            await inter.response.send_message("Ошибка создания клоза",ephemeral=True)
+        if (self.bot.clm.getCloseByCreator(inter.author.id)):
+            await inter.response.send_message("У вас уже запущен клоз",ephemeral=True)
             return
+        
+        closeban = inter.guild.get_role(self.bot.settings.roles.closeban)
+        everyone = inter.guild.default_role
+
+        category = await inter.guild.create_category(
+            name="Close",
+            overwrites={
+                closeban:PermissionOverwrite(view_channel=False)
+            }
+        )
+
+        managechannel = await inter.guild.create_text_channel(
+            name = "Управление",
+            category=category,
+            overwrites={
+                everyone:PermissionOverwrite(view_channel=False),
+                closemod:PermissionOverwrite(view_channel=True),
+                closeban:PermissionOverwrite(view_channel=False)
+            }
+        )
+
+        waitingchannel = await inter.guild.create_voice_channel(
+           name="Ожидание", 
+        )
 
         await inter.response.send_message("Клоз создан",ephemeral=True)
 

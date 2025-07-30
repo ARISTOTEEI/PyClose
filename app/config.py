@@ -1,21 +1,5 @@
 from pydantic_settings import BaseSettings,SettingsConfigDict
-
-class Settings(BaseSettings):
-    DB_USER:str
-    DB_PASS:str
-    DB_NAME:str
-    DB_HOST:str
-    DB_PORT:str
-
-    @property
-    def DATABASE_url_asyncpg(self):
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-    
-    model_config = SettingsConfigDict(env_file="app/.env")
-
-settings = Settings()
-
-TOKEN = "MTAwMjIyMTYxMTM4NDA2MjAyNA.GNmHdQ.qXaw-2BZfGS4ZbZxfFbenjP6GxjAiCaGNuUdGw"
+from pydantic import BaseModel, Field
 
 roles = {
     "closemod":1011684141600878714,
@@ -23,18 +7,9 @@ roles = {
 }
 
 channels = {
-    "logs":13213,
-    "notif":1231,
-    "winnerch":1231
-}
-
-name_channel = {
-    "category_name":"",
-    "manage_name":"",
-    "wait_name":"",
-    "watch_name":"",
-    "ligh_name":"",
-    "dark_name":"",
+    "log_channel":13213,
+    "notification_channel":1231,
+    "win_channel":1231
 }
 
 emojis = {
@@ -55,3 +30,42 @@ line = {
     "5":"Полная поддержка"
 }
 
+class SRoles(BaseModel):
+    closemod:int
+    closeban:int
+
+class SChannels(BaseModel):
+    log_channel:int | None
+    notification_channel:int
+    win_channel:int
+
+class SEmojis(BaseModel):
+    Knife:str
+    Onion:str
+    Security:str
+    Conhands:str
+    Conhands:str
+    dark:str
+    light:str
+
+class Settings(BaseSettings):
+    DB_USER:str
+    DB_PASS:str
+    DB_NAME:str
+    DB_HOST:str
+    DB_PORT:str
+
+    channels:SChannels = Field(default=SChannels(**channels))
+    roles:SRoles = Field(default=SRoles(**roles))
+    emojis:SEmojis = Field(default=SEmojis(**emojis))
+    line:dict = Field(default=line)
+
+    TOKEN:str = Field(default="MTAwMjIyMTYxMTM4NDA2MjAyNA.GNmHdQ.qXaw-2BZfGS4ZbZxfFbenjP6GxjAiCaGNuUdGw")
+
+    @property
+    def DATABASE_url_asyncpg(self):
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+    
+    model_config = SettingsConfigDict(env_file="app/.env")
+
+settings = Settings()
