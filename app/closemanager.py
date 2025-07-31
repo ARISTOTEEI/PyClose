@@ -6,7 +6,7 @@ from app.utils.schemas import CloseMembers as CloseMemberORM
 from pydantic import BaseModel
 
 class CloseType(str,Enum):
-    COMMAND = 'command'
+    TEAM = 'team'
     RANDOM = 'random'
 
 
@@ -17,7 +17,7 @@ class CloseSource(BaseModel):
     waitingchannel:int
     creator:int
     lastcall:int | None = None
-    message:int
+    message:int | None = None
     messagechannel:int
 
 class CloseMembersSource(BaseModel):
@@ -38,11 +38,12 @@ class CloseManager:
     def __init__(self,db:async_sessionmaker[AsyncSession]):
         self.db = db
     
-    async def create_close(self,close_data:CloseSource) -> None:
+    async def create_close(self,close_data:CloseSource) -> CloseSource:
         async with self.db() as session:
             close = CloseORM(**close_data.model_dump())
             session.add(close)
             await session.commit()
+            return await self.getCloseByCreator(close_data.creator)
 
     async def update_close(self,id:int,close_data:CloseSource) -> None:
         async with self.db() as session:
