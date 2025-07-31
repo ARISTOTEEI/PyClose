@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings,SettingsConfigDict
 from pydantic import BaseModel, Field
 
 roles = {
-    "closemod":1011684141600878714,
-    "closeban":1231
+    "closemod":1160124199902396458,
+    "closeban":1160128387390636085
 }
 
 channels = {
@@ -43,7 +43,7 @@ class SEmojis(BaseModel):
     Knife:str
     Onion:str
     Security:str
-    Conhands:str
+    Conhand:str
     Conhands:str
     dark:str
     light:str

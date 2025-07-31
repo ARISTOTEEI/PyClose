@@ -1,16 +1,15 @@
 import disnake
 from disnake.ext.commands import InteractionBot
-from utils import database
-from config import settings
-from closemanager import CloseManager
-from utils.database import async_session
+from app.config import settings
+from app.closemanager import CloseManager
+from app.utils.database import async_session
 
 class CloseBot(InteractionBot):
     def __init__(self):
         super().__init__(intents=disnake.Intents.all())
         self.clm = CloseManager(async_session)
         self.settings = settings
-        self.async_sessionmaker = database.async_session
+        self.async_sessionmaker = async_session
         self.load_extensions(r"app\commands")
         self.load_extensions(r"app\events")
         self.load_extensions(r"app\buttons")

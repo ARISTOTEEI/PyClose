@@ -6,7 +6,7 @@ from app.utils.database import Base
 from enum import Enum
 
 class CloseType(str,Enum):
-    COMMAND = 'command'
+    TEAM = 'team'
     RANDOM = 'random'
 
 class Closes(Base):
@@ -17,13 +17,12 @@ class Closes(Base):
     waitingchannel: Mapped[int] = mapped_column(BigInteger) # Это голосовой канал ожидания
     creator:Mapped[int] = mapped_column(BigInteger)
     lastcall:Mapped[int | None] = mapped_column(default=None) # Время последнего вызова на клоз
-    message:Mapped[int] = mapped_column(BigInteger) # Это сообщение с записью на клоз
+    message:Mapped[int | None] = mapped_column(BigInteger,default=None) # Это сообщение с записью на клоз
     messagechannel:Mapped[int] = mapped_column(BigInteger) # Это канал с записью на клоз
 
 class CloseMembers(Base):
     __tablename__ = "closemember"
-    userid:Mapped[int] = mapped_column(BigInteger)
-    closeid:Mapped[int | None] = mapped_column(ForeignKey("close.id"),default=None,primary_key=True)
+    userid:Mapped[int] = mapped_column(BigInteger,primary_key=True)
     pos1games: Mapped[int] = mapped_column(default=0)
     pos1wins: Mapped[int] = mapped_column(default=0)
     pos2games: Mapped[int] = mapped_column(default=0)

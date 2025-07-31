@@ -11,22 +11,23 @@ class CloseCommand(Cog):
         super().__init__()
 
     @commands.slash_command(name="close",description="Create close Dota 2")
-    async def close_command(self,inter:dis.AppCmdInter,type:str = Param(choices={"random":"random","team":"team"})):
+    async def close_command(self,inter:dis.ApplicationCommandInteraction,type:str = Param(choices={"random":"random","team":"team"})):
+        await inter.response.defer(with_message=True)
         if not(inter.guild):
-            await inter.response.send_message("Не используйте в личных сообщениях",ephemeral=True)
+            await inter.edit_original_message("Не используйте в личных сообщениях")
             return
         closemod = inter.guild.get_role(self.bot.settings.roles.closemod)
         
         if closemod not in inter.author.roles:
-            await inter.response.send_message("У вас нету роли клозмейкера",ephemeral=True)
+            await inter.edit_original_message("У вас нету роли клозмейкера")
             return
         
-        if (self.bot.clm.getCloseByCreator(inter.author.id)):
-            await inter.response.send_message("У вас уже запущен клоз",ephemeral=True)
+        if (await self.bot.clm.getCloseByCreator(inter.author.id)):
+            await inter.edit_original_message("У вас уже запущен клоз")
             return
         
         closeban = inter.guild.get_role(self.bot.settings.roles.closeban)
-        everyone = interself.bot.settings..guild_role
+        everyone = inter.guild.default_role
 
         category = await inter.guild.create_category(
             name="Close",
@@ -130,13 +131,46 @@ class CloseCommand(Cog):
         row = dis.ui.ActionRow.with_message_components()
         row.add_button(
             style=dis.ButtonStyle.primary,
-            label="Уведомить"
+            label="Уведомить",
             custom_id=f"closenotify.{close.id}"
         )
+        row.add_button(
+            style=dis.ButtonStyle.primary,
+            label="Позвать",
+            custom_id=f"closecall.{close.id}"
+        )
+        row.add_button(
+            style=dis.ButtonStyle.primary,
+            label="Кикнуть",
+            custom_id=f"closeremove.{close.id}"
+        )
+        row.add_button(
+            style=dis.ButtonStyle.primary,
+            label="Начать",
+            custom_id=f"closestart.{close.id}"
+        )
+        row.add_button(
+            style=dis.ButtonStyle.primary,
+            label="Отменить",
+            custom_id=f"closecancel.{close.id}"
+        )
+        await managechannel.send(embed = message,components=row)
+        await inter.edit_original_message("Клоз создан")
 
+    @commands.slash_command(name="removeclose")
+    async def close_remove(self,inter:dis.AppCmdInter):
+        await inter.response.defer(with_message=True,ephemeral=True)
+        close = await self.bot.clm.getCloseByCreator(inter.author.id)
+        if close:
+            channel = inter.guild.get_channel(close.managechannel)
 
-        await inter.response.send_message("Клоз создан",ephemeral=True)
-
+            for channel in channel.category.channels:
+                await channel.delete()
+            
+            await inter.edit_original_message("Успешно")
+        else:
+            await inter.edit_original_message("Нету каналов")
+        
 
 def setup(bot:InteractionBot):
     bot.add_cog(CloseCommand(bot))
