@@ -1,16 +1,22 @@
 from sqlalchemy.ext.asyncio import AsyncSession,async_sessionmaker
 from sqlalchemy import update,select
 from enum import Enum
-from app.utils.schemas import Closes as CloseORM
-from app.utils.schemas import CloseMembers as CloseMemberORM
-from pydantic import BaseModel
+from app.utils.schemas import CloseORM
+from app.utils.schemas import CloseMemberORM
+from app.utils.schemas import MemberORM
+from app.utils.schemas import CloseType,TeamType
+from pydantic import BaseModel,ConfigDict
+from pprint import pprint
+from datetime import datetime
 
-class CloseType(str,Enum):
-    TEAM = 'team'
-    RANDOM = 'random'
 
+class CloseMemberData(BaseModel):
+    id:int | None = None
+    discord_id:int
+    pos:int
+    team: TeamType
 
-class CloseSource(BaseModel):
+class CloseData(BaseModel):
     id: int | None = None
     type:CloseType
     managechannel:int
@@ -19,10 +25,12 @@ class CloseSource(BaseModel):
     lastcall:int | None = None
     message:int | None = None
     messagechannel:int
+    members:list[CloseMemberData] | list
 
-class CloseMembersSource(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+class MemberData(BaseModel):
     userid:int
-    closeid:int | None = None
     pos1games: int = 0
     pos1wins: int = 0 
     pos2games: int = 0
@@ -38,14 +46,14 @@ class CloseManager:
     def __init__(self,db:async_sessionmaker[AsyncSession]):
         self.db = db
     
-    async def create_close(self,close_data:CloseSource) -> CloseSource:
+    async def create_close(self,close_data:CloseData) -> CloseData:
         async with self.db() as session:
             close = CloseORM(**close_data.model_dump())
             session.add(close)
             await session.commit()
             return await self.getCloseByCreator(close_data.creator)
 
-    async def update_close(self,id:int,close_data:CloseSource) -> None:
+    async def update_close(self,id:int,close_data:CloseData) -> None:
         async with self.db() as session:
             stmt = (
                 update(CloseORM)
@@ -55,14 +63,14 @@ class CloseManager:
             await session.execute(stmt)
             await session.commit()
     
-    async def getCloseByID(self,id:int) -> CloseSource:
+    async def __getCloseByID__(self,id:int) -> CloseData:
         async with self.db() as session:
             close = await session.get(CloseORM,id)
-            close = CloseSource.model_validate(close,from_attributes=True)
+            close = CloseData.model_validate(close)
             await session.commit()
             return close
 
-    async def getCloseByCreator(self,creator_id:int) -> CloseSource:
+    async def getCloseByCreator(self,creator_id:int) -> CloseData:
         async with self.db() as session:
             stmt = (
                 select(CloseORM)
@@ -70,35 +78,40 @@ class CloseManager:
             )
             close = await session.execute(stmt)
             try:
-                close = CloseSource.model_validate(close.scalar_one_or_none(),from_attributes=True)
-            except:
+                # print("-----------------------", \
+                # f"{close.scalar_one_or_none()}",
+                # "-----------------------------")
+                close = CloseData.model_validate(close.scalar_one_or_none())
+                pprint(close)
+            except Exception as ex:
+                print("--------\n",f"{ex=}\n","--------\n")
                 close = None
             return close
     
-    async def create_clmember(self,user_id):
-        async with self.db() as session:
-            member = CloseMemberORM(userid = user_id)
-            await session.add(member)   
-            await session.commit()
+    # async def create_clmember(self,user_id):
+    #     async with self.db() as session:
+    #         member = CloseMemberORM(userid = user_id)
+    #         await session.add(member)   
+    #         await session.commit()
 
-    async def getClmemberByUSID(self,user_id:int) -> CloseMembersSource:
-        async with self.db() as session:
-            stmt = (
-                select(CloseMemberORM)
-                .filter_by(userid = user_id)
-            )
-            member = await session.execute(stmt)
-            member = member.scalar_one_or_none()
-            member = CloseMembersSource.model_validate(member,from_attributes=True)
-            await session.commit()
-            return member
+    # async def getClmemberByUSID(self,user_id:int) -> CloseMembersSource:
+    #     async with self.db() as session:
+    #         stmt = (
+    #             select(CloseMemberORM)
+    #             .filter_by(userid = user_id)
+    #         )
+    #         member = await session.execute(stmt)
+    #         member = member.scalar_one_or_none()
+    #         member = CloseMembersSource.model_validate(member,from_attributes=True)
+    #         await session.commit()
+    #         return member
 
-    async def update_clmember(self,member_data:CloseMembersSource):
-        async with self.db() as session:
-            stmt = (
-                update(CloseMemberORM)
-                .values(**member_data.model_dump())
-                .filter_by(userid = member_data.userid)
-            )
-            await session.execute(stmt)
-            await session.commit()
+    # async def update_clmember(self,member_data:CloseMembersSource):
+    #     async with self.db() as session:
+    #         stmt = (
+    #             update(CloseMemberORM)
+    #             .values(**member_data.model_dump())
+    #             .filter_by(userid = member_data.userid)
+    #         )
+    #         await session.execute(stmt)
+    #         await session.commit()

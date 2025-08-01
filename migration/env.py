@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from app.utils.database import Base
-from app.utils.schemas import Closes,CloseMembers,CloseType
+from app.utils.schemas import CloseType,TeamType,CloseORM,CloseMemberORM,MemberORM
 from app.config import settings
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
