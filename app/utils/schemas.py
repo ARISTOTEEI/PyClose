@@ -1,51 +1,58 @@
-from sqlalchemy import Identity,ForeignKey,BigInteger,text
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import mapped_column,Mapped
-from datetime import datetime,timezone
-from app.utils.database import Base
-from enum import Enum
+from pydantic import BaseModel,Field
+from app.utils.models import CloseType,TeamType
+from typing import List,Optional
 
-class CloseType(str,Enum):
-    TEAM = 'team'
-    RANDOM = 'random'
+class CloseMemberSchema(BaseModel):
+    id:int | None = None
+    discord_id:int
+    pos:int
+    team: TeamType
+    close_id:int
+    class Config:
+        from_attributes = True  
 
-class TeamType(str,Enum):
-    DARK = 'dark'
-    LIGHT = 'light'
+class CloseSchema(BaseModel):
+    id: int | None = None
+    type:CloseType
+    managechannel:int
+    waitingchannel:int
+    creator:int
+    lastcall:int | None = None
+    message:int | None = None
+    messagechannel:int
+    members:list[CloseMemberSchema] | list
+    class Config:
+        from_attributes = True  
 
-class CloseORM(Base):
-    __tablename__ = "close"
-    id: Mapped[int] = mapped_column(primary_key=True,server_default=Identity())
-    type: Mapped[CloseType] = mapped_column(SQLEnum(CloseType))
-    managechannel: Mapped[int] = mapped_column(BigInteger) # Это управление клозом
-    waitingchannel: Mapped[int] = mapped_column(BigInteger) # Это голосовой канал ожидания
-    creator:Mapped[int] = mapped_column(BigInteger)
-    lastcall:Mapped[int | None] = mapped_column(default=None) # Время последнего вызова на клоз
-    message:Mapped[int | None] = mapped_column(BigInteger,default=None) # Это сообщение с записью на клоз
-    messagechannel:Mapped[int] = mapped_column(BigInteger) # Это канал с записью на клоз
-    members: Mapped[list["CloseMemberORM"]] = relationship("CloseMemberORM", lazy="selectin",back_populates="close",cascade="all, delete-orphan",)  # Автоматическое удаление связанных записейpassive_deletes=True  # Оптимизация для PostgreSQL
+class CloseCreateSchema(BaseModel):
+    type: CloseType
+    managechannel: int
+    waitingchannel: int
+    creator: int
+    messagechannel: int
+    message: int | None = None
+    members: List[CloseMemberSchema] = Field(default_factory=list)
 
+class CloseUpdateSchema(BaseModel):
+    type: Optional[CloseType] = None
+    managechannel: Optional[int] = None
+    waitingchannel: Optional[int] = None
+    lastcall: Optional[int] = None
+    message: Optional[int] = None
+    messagechannel: Optional[int] = None
 
-class CloseMemberORM(Base):
-    __tablename__ = 'closemember'
-    id:Mapped[int] = mapped_column(primary_key=True,server_default=Identity())
-    discord_id:Mapped[int] = mapped_column(BigInteger)
-    pos: Mapped[int]
-    team: Mapped[TeamType] = mapped_column(SQLEnum(TeamType))
-    close_id: Mapped[int] = mapped_column(ForeignKey("close.id"),nullable=False)
-    close: Mapped["CloseORM"] = relationship("CloseORM", back_populates="members")
-
-class MemberORM(Base):
-    __tablename__ = "member"
-    userid:Mapped[int] = mapped_column(BigInteger,primary_key=True)
-    pos1games: Mapped[int] = mapped_column(default=0)
-    pos1wins: Mapped[int] = mapped_column(default=0)
-    pos2games: Mapped[int] = mapped_column(default=0)
-    pos2wins: Mapped[int] = mapped_column(default=0)
-    pos3games: Mapped[int] = mapped_column(default=0)
-    pos3wins: Mapped[int] = mapped_column(default=0)
-    pos4games: Mapped[int] = mapped_column(default=0)
-    pos4wins: Mapped[int] = mapped_column(default=0)
-    pos5games: Mapped[int] = mapped_column(default=0)
-    pos5wins: Mapped[int] = mapped_column(default=0)
+class UserSchema(BaseModel):
+    userid:int
+    pos1games: int = 0
+    pos1wins: int = 0 
+    pos2games: int = 0
+    pos2wins: int = 0
+    pos3games: int = 0
+    pos3wins: int = 0
+    pos4games: int = 0
+    pos4wins: int = 0
+    pos5games: int = 0
+    pos5wins: int = 0
+    class Config:
+        from_attributes = True
+        
