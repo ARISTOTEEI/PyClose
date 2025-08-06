@@ -33,6 +33,11 @@ class CloseManager:
                 close = None
             return close
 
+    async def getCloseById(self,close_id:int) -> CloseSchema:
+        async with self.db() as session:
+            close = await session.get(CloseORM,close_id)
+            return CloseSchema.model_validate(close)
+
     async def update_close(self,id:int,close_data:CloseUpdateSchema) -> None:
         async with self.db() as session:
             stmt = (
@@ -54,7 +59,7 @@ class CloseManager:
     
     #Close Member Methods
 
-    async def append_member(self,close_id:int,member:CloseMemberSchema) -> None:
+    async def append_member(self,close_id:int,member:CloseMemberCreateSchema) -> None:
         async with self.db() as session:
             member = CloseMemberORM(**member.model_dump())
             session.add(member)

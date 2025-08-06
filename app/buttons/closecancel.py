@@ -1,0 +1,28 @@
+import disnake as dis
+from disnake.ext.commands import Cog
+from disnake.ext import commands
+
+from app.client import CloseBot
+
+class CloseCancelButton(Cog):
+    def __init__(self,bot:CloseBot):
+        self.bot = bot
+        super().__init__()
+    
+    @commands.Cog.listener()
+    async def on_button_click(self,inter:dis.MessageInteraction):
+        if inter.component.custom_id.startswith("closecancel"):
+            component = inter.component
+            raw_data = component.custom_id.split(".")
+            if inter.guild.get_role(self.bot.settings.roles.closemod) in inter.author.roles:
+                close = await self.bot.clm.getCloseById(raw_data[-1])
+                if close.creator == inter.author.id:
+                    await self.bot.clm.delete_close(close.creator)
+                    await inter.response.send_message("Вы успешно удалили клоз",ephemeral=True)
+                else:
+                    await inter.response.send_message("Вы не создатель клоза",ephemeral=True)
+            else:
+                await inter.response.send_message("Вы не являетесь клозмодом",ephemeral=True)
+
+def setup(bot:CloseBot):
+    bot.add_cog(CloseCancelButton(bot))
