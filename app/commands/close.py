@@ -3,7 +3,7 @@ from disnake.ext.commands import Cog, Param, InteractionBot
 from disnake.ext import commands
 from disnake import PermissionOverwrite,Embed
 from ..client import CloseBot
-from ..closemanager import CloseSource
+from app.utils.schemas import CloseCreateSchema,CloseSchema,CloseUpdateSchema
 
 class CloseCommand(Cog):
     def __init__(self,bot:CloseBot) -> None:
@@ -69,7 +69,7 @@ class CloseCommand(Cog):
                 closeban:PermissionOverwrite(view_channel=False)
             }
         )
-        source = CloseSource(
+        source = CloseCreateSchema(
             type=type,
             managechannel=managechannel.id,
             waitingchannel=waitingchannel.id,
@@ -86,7 +86,7 @@ class CloseCommand(Cog):
                         "fields": [
                         {
                             "name": "Силы тьмы",
-                            "value": f'{self.bot.settings.emojis.Knife}・Лёгкая \n\n{self.bot.settings.emojis.Onion}・Центр \n\n{self.bot.settings.emojis.Security}・Сложная \n\n{self.bot.settings.emojis.Conhand}・Частичная поддержка\n\n{self.bot.settings.emojis.Conhands}・Полная поддержка',
+                            "value": f'{self.bot.settings.emojis.Knife}・Лёгкая \n{inter.author.mention} \n\n{self.bot.settings.emojis.Onion}・Центр \n\n{self.bot.settings.emojis.Security}・Сложная \n\n{self.bot.settings.emojis.Conhand}・Частичная поддержка\n\n{self.bot.settings.emojis.Conhands}・Полная поддержка',
                             "inline": True
                         },
                         {
@@ -113,7 +113,6 @@ class CloseCommand(Cog):
             row.add_button(
                 style=dis.ButtonStyle.danger,
                 label="Выйти из записи",
-                emoji=self.bot.settings.emojis.light,
                 custom_id=f'closeexit.{close.id}'
             )
             await messagechannel.send(embed = message,components=row)
@@ -154,7 +153,9 @@ class CloseCommand(Cog):
             label="Отменить",
             custom_id=f"closecancel.{close.id}"
         )
-        await managechannel.send(embed = message,components=row)
+        message = await managechannel.send(embed = message,components=row)
+        close_data = CloseUpdateSchema(message=message.id)
+        await self.bot.clm.update_close(close.id,close_data)
         await inter.edit_original_message("Клоз создан")
 
     @commands.slash_command(name="removeclose")
@@ -163,10 +164,10 @@ class CloseCommand(Cog):
         close = await self.bot.clm.getCloseByCreator(inter.author.id)
         if close:
             channel = inter.guild.get_channel(close.managechannel)
-
             for channel in channel.category.channels:
                 await channel.delete()
-            
+            await channel.category.delete()
+            await self.bot.clm.delete_close(close.creator)
             await inter.edit_original_message("Успешно")
         else:
             await inter.edit_original_message("Нету каналов")

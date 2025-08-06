@@ -31,7 +31,7 @@ class CloseMemberORM(Base):
     discord_id:Mapped[int] = mapped_column(BigInteger)
     pos: Mapped[int]
     team: Mapped[TeamType] = mapped_column(SQLEnum(TeamType))
-    close_id: Mapped[int] = mapped_column(ForeignKey("close.id"),nullable=False)
+    close_id: Mapped[int] = mapped_column(ForeignKey("close.id", ondelete="CASCADE"),nullable=False)
     close: Mapped["CloseORM"] = relationship("CloseORM", back_populates="members")
 
 class UserORM(Base):

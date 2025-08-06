@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession,async_sessionmaker
 from sqlalchemy import update,select,insert,delete
 from app.utils.schemas import *
-from app.utils.models import CloseORM,CloseMemberORM
+from app.utils.models import CloseORM,CloseMemberORM,UserORM
 
 class CloseManager:
     def __init__(self,db:async_sessionmaker[AsyncSession]):
@@ -70,19 +70,54 @@ class CloseManager:
             members = [CloseMemberSchema.model_validate(i) for i in members.scalars().all()]
             return members
 
+    async def get_member(self,discord_id:int) -> CloseMemberSchema:
+        async with self.db() as session:
+            stmt = (
+                select(CloseMemberORM)
+                .filter_by(discord_id = discord_id)
+            )
+            data = await session.execute(stmt)
+            data = CloseMemberSchema.model_validate(data.scalar_one_or_none())
+            return data
+        
+
     #User methods
 
-    async def create_user(self,user_id):
-        pass
+    async def create_user(self,user_id:int) -> None:
+        async with self.db() as session:
+            user = UserORM(userid = user_id)
+            session.add(user)
+            await session.commit()
 
-    async def get_user(self,user_id):
-        pass
+    async def get_user(self,user_id:int) -> UserSchema:
+        async with self.db() as session:
+            stmt = (
+                select(UserORM)
+                .filter_by(userid = user_id)
+            )
+            data = await session.execute(stmt)
+            data = data.scalar_one_or_none()
+            data = UserSchema.model_validate(data)
+            return data
 
-    async def update_user(self,user):
-        pass
+    async def update_user(self,user:UserSchema) -> None:
+        async with self.db() as session:
+            stmt = (
+                update(UserORM)
+                .values(**user.model_dump())
+                .filter_by(userid = user.userid)
+            )
+            await session.execute(stmt)
+            await session.commit()
 
-    async def delete_user(self,user):
-        pass
+    async def delete_user(self,user_id:int) -> None:
+        async with self.db() as session:
+            stmt = (
+                delete(UserORM)
+                .filter_by(userid = user_id)
+            )
+            await session.execute(stmt)
+            await session.commit()
 
     # async def create_clmember(self,user_id):
     #     async with self.db() as session:

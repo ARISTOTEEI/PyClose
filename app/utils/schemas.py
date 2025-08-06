@@ -11,6 +11,14 @@ class CloseMemberSchema(BaseModel):
     class Config:
         from_attributes = True  
 
+class CloseMemberCreateSchema(BaseModel):
+    discord_id:int
+    pos:int
+    team: TeamType
+    close_id:int
+    class Config:
+        from_attributes = True 
+
 class CloseSchema(BaseModel):
     id: int | None = None
     type:CloseType
@@ -31,15 +39,10 @@ class CloseCreateSchema(BaseModel):
     creator: int
     messagechannel: int
     message: int | None = None
-    members: List[CloseMemberSchema] = Field(default_factory=list)
 
 class CloseUpdateSchema(BaseModel):
-    type: Optional[CloseType] = None
-    managechannel: Optional[int] = None
-    waitingchannel: Optional[int] = None
     lastcall: Optional[int] = None
     message: Optional[int] = None
-    messagechannel: Optional[int] = None
 
 class UserSchema(BaseModel):
     userid:int
@@ -55,4 +58,3 @@ class UserSchema(BaseModel):
     pos5wins: int = 0
     class Config:
         from_attributes = True
-        

@@ -18,5 +18,9 @@ class CloseBot(InteractionBot):
     async def on_ready(self):
         print(f"Bot {self.user.display_name} is online!")
 
+    async def on_button_click(self,inter:disnake.MessageInteraction):
+        if inter.guild.get_role(self.settings.roles.closeban) in inter.author.roles:
+            return await inter.response.send_message("У вас клозбан!",ephemeral=True)
+
     def launch(self):
         self.run(self.settings.TOKEN)
