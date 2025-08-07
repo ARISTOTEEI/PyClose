@@ -17,7 +17,7 @@ class TeamButton(Cog):
         if raw_data[0] == "team":
             embed = dis.Embed(title="Выбери позицию")
             row = dis.ui.ActionRow.with_message_components()
-            members = await self.bot.clm.get_members(raw_data[-1])
+            members = await self.bot.clm.get_members(int(raw_data[-1]))
             row.add_button(
                 style=dis.ButtonStyle.grey,
                 custom_id=f"pos.1.{raw_data[1]}.{raw_data[2]}",
@@ -46,22 +46,27 @@ class TeamButton(Cog):
                 style=dis.ButtonStyle.grey,
                 custom_id=f"pos.5.{raw_data[1]}.{raw_data[2]}",
                 emoji=self.bot.settings.emojis.Conhands,
-                disabled = next((True for x in members if x.pos == 1 and x.team == raw_data[1]),False)
+                disabled = next((True for x in members if x.pos == 5 and x.team == raw_data[1]),False)
             )
             await inter.response.send_message(components=row,embed=embed,ephemeral=True)
         if raw_data[0] == "pos":
-            member = CloseMemberCreateSchema(
-                discord_id=inter.author.id,
-                pos=int(raw_data[1]),
-                team=raw_data[2],
-                close_id=raw_data[-1]
-            )
-            close = await self.bot.clm.getCloseById(raw_data[-1])
-            await self.bot.clm.append_member(raw_data[-1],member)
-            embed = await update_message(self.bot,raw_data[-1])
+            member = await self.bot.clm.get_member(inter.author.id)
+            if member is None:
+                member = CloseMemberCreateSchema(
+                    discord_id=inter.author.id,
+                    pos=int(raw_data[1]),
+                    team=raw_data[2],
+                    close_id=raw_data[-1]
+                )
+                await self.bot.clm.append_member(int(raw_data[-1]),member)
+            else:
+                await self.bot.clm.edit_member(inter.author.id,int(raw_data[1]),raw_data[2])
+        
+            close = await self.bot.clm.getCloseById(int(raw_data[-1]))
+            embed = await update_message(self.bot,int(raw_data[-1]))
             message = await inter.guild.get_channel(close.messagechannel).fetch_message(close.message)
             await message.edit(embed = embed)
-            await inter.response.send_message("Вы успешно записались!!!",ephemeral=True)
+            await inter.response.edit_message("Вы успешно записались!!!",components=[] ,embed=None)
 
 
 
