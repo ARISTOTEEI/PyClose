@@ -76,6 +76,16 @@ class CloseManager:
             members = [CloseMemberSchema.model_validate(i) for i in members.scalars().all()]
             return members
 
+    async def delete_member(self,discord_id:int):
+        async with self.db() as session:
+            stmt = (
+                delete(CloseMemberORM)
+                .filter_by(discord_id = discord_id)
+            )
+            await session.execute(stmt)
+            await session.commit()
+
+
     async def get_member(self,discord_id:int) -> CloseMemberSchema:
         async with self.db() as session:
             stmt = (
