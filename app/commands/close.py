@@ -115,8 +115,9 @@ class CloseCommand(Cog):
                 label="Выйти из записи",
                 custom_id=f'closeexit.{close.id}'
             )
-            await messagechannel.send(embed = message,components=row)
-
+            message = await messagechannel.send(embed = message,components=row)
+            close_data = CloseUpdateSchema(message=message.id)
+            await self.bot.clm.update_close(close.id,close_data)
         else:
             pass
 
@@ -153,9 +154,7 @@ class CloseCommand(Cog):
             label="Отменить",
             custom_id=f"closecancel.{close.id}"
         )
-        message = await managechannel.send(embed = message,components=row)
-        close_data = CloseUpdateSchema(message=message.id)
-        await self.bot.clm.update_close(close.id,close_data)
+        await managechannel.send(embed = message,components=row)
         await inter.edit_original_message("Клоз создан")
 
     @commands.slash_command(name="removeclose")
