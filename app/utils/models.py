@@ -28,7 +28,7 @@ class CloseORM(Base):
 class CloseMemberORM(Base):
     __tablename__ = 'closemember'
     id:Mapped[int] = mapped_column(primary_key=True,server_default=Identity())
-    discord_id:Mapped[int] = mapped_column(BigInteger)
+    discord_id:Mapped[int] = mapped_column(BigInteger,unique=True)
     pos: Mapped[int]
     team: Mapped[TeamType] = mapped_column(SQLEnum(TeamType))
     close_id: Mapped[int] = mapped_column(ForeignKey("close.id", ondelete="CASCADE"),nullable=False)
