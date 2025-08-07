@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession,async_sessionmaker
 from sqlalchemy import update,select,insert,delete
 from app.utils.schemas import *
 from app.utils.models import CloseORM,CloseMemberORM,UserORM
+from pydantic import ValidationError
 
 class CloseManager:
     def __init__(self,db:async_sessionmaker[AsyncSession]):
@@ -82,10 +83,24 @@ class CloseManager:
                 .filter_by(discord_id = discord_id)
             )
             data = await session.execute(stmt)
-            data = CloseMemberSchema.model_validate(data.scalar_one_or_none())
-            return data
-        
+            data = data.scalar_one_or_none()
+            if data != None:
+                data = CloseMemberSchema.model_validate(data,from_attributes=True)
+                return data
+            else:
+                return None
 
+    async def edit_member(self,discord_id:int,pos:int,team:TeamType) -> None:
+        async with self.db() as session:
+            stmt = (
+                update(CloseMemberORM)
+                .values(pos = pos,team = team)
+                .filter_by(discord_id = discord_id)
+            )
+            await session.execute(stmt)
+            await session.commit()
+
+ 
     #User methods
 
     async def create_user(self,user_id:int) -> None:
