@@ -3,7 +3,8 @@ from pydantic import BaseModel, Field
 
 roles = {
     "closemod":1160124199902396458,
-    "closeban":1160128387390636085
+    "closeban":1160128387390636085,
+    "closenotify":0
 }
 
 channels = {
@@ -33,6 +34,7 @@ line = {
 class SRoles(BaseModel):
     closemod:int
     closeban:int
+    closenotify:int
 
 class SChannels(BaseModel):
     log_channel:int | None
