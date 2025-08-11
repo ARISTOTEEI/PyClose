@@ -56,3 +56,6 @@ class CloseNotifyButton(Cog):
                     await inter.response.send_message("Вы не создатель клоза",ephemeral=True)
             else:
                 await inter.response.send_message("Вы не являетесь клозмодом",ephemeral=True)
+
+def setup(bot:CloseBot):
+    bot.add_cog(CloseNotifyButton(bot))
