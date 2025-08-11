@@ -4,12 +4,12 @@ from pydantic import BaseModel, Field
 roles = {
     "closemod":1160124199902396458,
     "closeban":1160128387390636085,
-    "closenotify":0
+    "closenotify":1160124206177079357
 }
 
 channels = {
     "log_channel":13213,
-    "notification_channel":1231,
+    "notification_channel":1011561762417557576,
     "win_channel":1231
 }
 
