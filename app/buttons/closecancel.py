@@ -17,8 +17,12 @@ class CloseCancelButton(Cog):
             if inter.guild.get_role(self.bot.settings.roles.closemod) in inter.author.roles:
                 close = await self.bot.clm.getCloseById(raw_data[-1])
                 if close.creator == inter.author.id:
-                    await self.bot.clm.delete_close(close.creator)
                     await inter.response.send_message("Вы успешно удалили клоз",ephemeral=True)
+                    category = inter.guild.get_channel(close.managechannel).category
+                    for channel in category.channels:
+                        await channel.delete()
+                    await category.delete()
+                    await self.bot.clm.delete_close(close.creator)
                 else:
                     await inter.response.send_message("Вы не создатель клоза",ephemeral=True)
             else:
