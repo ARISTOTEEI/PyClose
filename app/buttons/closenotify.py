@@ -15,14 +15,14 @@ class CloseNotifyButton(Cog):
         if inter.component.custom_id.startswith("closenotify"):
             raw_data = inter.component.custom_id.split(".")
             close_id = raw_data[-1]
-            close = await self.bot.clm.getCloseById(close_id)
+            close = await self.bot.clm.getCloseById(int(close_id))
             creator = inter.guild.get_member(close.creator)
             if inter.guild.get_role(self.bot.settings.roles.closemod) in inter.author.roles:
                 if creator == inter.author:
                     embed = dis.Embed.from_dict(
                     {
                         "title": "<:freeiconbell8262174:1393538484731510794>  Dota 2 Клоз ・ [RU] Dota 2",
-                        "description": f'Участвуй в игре 5 на 5 против ребят нашего сервера. Улучшай свою статистику ( /stats ), попадай в топы, знакомься с ребятами и получай опыт в игре! Главная цель игры - защитить свою крепость и разрушить крепость противника! СБОР В:<#${close.waitingchannel}>',
+                        "description": f'Участвуй в игре 5 на 5 против ребят нашего сервера. Улучшай свою статистику ( /stats ), попадай в топы, знакомься с ребятами и получай опыт в игре! Главная цель игры - защитить свою крепость и разрушить крепость противника! СБОР В:{inter.guild.get_channel(close.waitingchannel).mention}',
                         "color": 3092790,
                         # "fields": [
                         #   {
