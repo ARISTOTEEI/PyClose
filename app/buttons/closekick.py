@@ -42,3 +42,6 @@ class CloseKickButton(Cog):
                     await inter.edit_original_message("## Вы не создатель клоза")
             else:
                 await inter.edit_original_message("## Вы не клозмод")
+
+def setup(bot:CloseBot):
+    bot.add_cog(CloseKickButton(bot))

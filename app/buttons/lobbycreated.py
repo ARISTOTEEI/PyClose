@@ -23,3 +23,6 @@ class LobbyCreatedButton(Cog):
                 } 
             )
             await inter.response.edit_message(embed = embed,components=None)
+
+def setup(bot:CloseBot):
+    bot.add_cog(LobbyCreatedButton(bot))

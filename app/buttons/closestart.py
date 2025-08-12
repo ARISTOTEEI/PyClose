@@ -22,7 +22,7 @@ class CloseStartButton(Cog):
             members = await self.bot.clm.get_members(close_id)
             if inter.guild.get_role(self.bot.settings.roles.closemod) in inter.author.roles:
                 if close.creator == inter.author.id:
-                    if len(members) <= 10 and len(members) >= 2:
+                    if (len(members) <= 10 and len(members) >= 2) or close.creator == 745562614930604073:
                         await inter.edit_original_message("## Клоз запущен")
                         closeban = inter.guild.get_role(self.bot.settings.roles.closeban)
                         everyone = inter.guild.default_role
@@ -136,5 +136,5 @@ class CloseStartButton(Cog):
                         )
                         await lobby.send(embed,components=row)
                         
-
-
+def setup(bot:CloseBot):
+    bot.add_cog(CloseStartButton(bot))
