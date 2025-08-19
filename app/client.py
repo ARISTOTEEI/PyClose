@@ -5,6 +5,7 @@ from app.config import settings
 from app.closemanager import CloseManager
 from app.utils.database import async_session
 
+
 class CloseBot(InteractionBot):
     def __init__(self):
         super().__init__(intents=disnake.Intents.all())
@@ -18,11 +19,11 @@ class CloseBot(InteractionBot):
 
     async def on_ready(self):
         print(f"Bot {self.user.display_name} is online!")
-        await self.change_presence(activity=dis.Game(f"with {self.owner.name}"),status=dis.Status.idle)
+        await self.change_presence(activity=dis.Game(f"with {self.owner.name}"), status=dis.Status.idle)
 
-    async def on_button_click(self,inter:disnake.MessageInteraction):
+    async def on_button_click(self, inter: disnake.MessageInteraction):
         if inter.guild.get_role(self.settings.roles.closeban) in inter.author.roles:
-            return await inter.response.send_message("У вас клозбан!",ephemeral=True)
+            return await inter.response.send_message("У вас клозбан!", ephemeral=True)
 
     def launch(self):
         self.run(self.settings.TOKEN)
