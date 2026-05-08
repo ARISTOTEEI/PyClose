@@ -11,7 +11,7 @@ class CloseManager:
 
     # CloseMethods
 
-    async def create_close(self, close_data: CloseCreateSchema) -> CloseSchema:
+    async def create_close(self, close_data: CloseCreateSchema) -> CloseSchema | None:
         async with self.db() as session:
             stmt = (
                 insert(CloseORM)
@@ -22,7 +22,7 @@ class CloseManager:
             await session.commit()
             return await self.getCloseByCreator(close_data.creator)
 
-    async def getCloseByCreator(self, creator_id: int) -> CloseSchema:
+    async def getCloseByCreator(self, creator_id: int) -> CloseSchema | None:
         async with self.db() as session:
             stmt = (
                 select(CloseORM)
@@ -63,7 +63,7 @@ class CloseManager:
 
     async def append_member(self, close_id: int, member: CloseMemberCreateSchema) -> None:
         async with self.db() as session:
-            member = CloseMemberORM(**member.model_dump())
+            member = CloseMemberORM(**member.model_dump()) # type: ignore
             session.add(member)
             await session.commit()
 
@@ -87,7 +87,7 @@ class CloseManager:
             await session.execute(stmt)
             await session.commit()
 
-    async def get_member(self, discord_id: int) -> CloseMemberSchema:
+    async def get_member(self, discord_id: int) -> CloseMemberSchema | None:
         async with self.db() as session:
             stmt = (
                 select(CloseMemberORM)
@@ -120,7 +120,7 @@ class CloseManager:
             session.add(user)
             await session.commit()
 
-    async def get_user(self, user_id: int) -> UserSchema:
+    async def get_user(self, user_id: int) -> UserSchema | None:
         async with self.db() as session:
             stmt = (
                 select(UserORM)
