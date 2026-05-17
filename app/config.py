@@ -8,9 +8,9 @@ roles = {
     "closenotify": 0
 }
 
-# for i,b in roles.items():
-#     if b==0:
-#         raise Exception(f"bad config {i} is {b}")
+for i,b in roles.items():
+    if b==0:
+        raise Exception(f"bad config {i} is {b}")
     
 channels = {
     "log_channel": 0,
