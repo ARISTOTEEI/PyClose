@@ -1,27 +1,39 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel, Field
+from disnake import PartialEmoji
 
 roles = {
-    "closemod": 0,
-    "closeban": 0,
+    "closemod": 1160124199902396458,
+    "closeban": 1160128387390636085,
     "closenotify": 0
 }
 
+# for i,b in roles.items():
+#     if b==0:
+#         raise Exception(f"bad config {i} is {b}")
+    
 channels = {
     "log_channel": 0,
     "notification_channel": 0,
     "win_channel": 0
 }
 
+
+### Emoji
+###                 <name:id>
 emojis = {
-    "Knife": "",
-    "Onion": "",
-    "Security": "",
-    "Conhand": "",
-    "Conhands": "",
+    "Knife": "<:Knife:1405556977014407168>",
+    "Onion": "<:Onion:1405557001982967919>",
+    "Security": "<:Security:1405557022908350654>",
+    "Conhand": "<:Conhand:1405557053618913320>",
+    "Conhands": "<:Conhands:1405557077807468585>",
     "dark": "🌑",
     "light": "🌕"
 }
+
+for i,b in emojis.items():
+    if b=="":
+        raise Exception(f"bad config {i} is '{b}' ")
 
 line = {
     "1": "Лёгкая",
@@ -67,7 +79,7 @@ class Settings(BaseSettings):
     line: dict = Field(default=line)
 
     TOKEN: str = Field(
-        default="TOKEN")
+        default="MTAwMjIyMTYxMTM4NDA2MjAyNA.GxZaXB.xdutByU6YRyolA36qqmH0wGPhRLj3R9JzZ94aI")
 
     @property
     def DATABASE_url_asyncpg(self):
