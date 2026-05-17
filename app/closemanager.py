@@ -59,6 +59,15 @@ class CloseManager:
             await session.execute(stmt)
             await session.commit()
 
+    async def get_closes(self) -> List[CloseSchema]:
+        async with self.db() as session:
+            stmt = (
+                select(CloseORM)
+            )
+            members = await session.execute(stmt)
+            members = [CloseSchema.model_validate(i) for i in members.scalars().all()]
+            return members
+
     # Close Member Methods
 
     async def append_member(self, close_id: int, member: CloseMemberCreateSchema) -> None:
@@ -74,8 +83,7 @@ class CloseManager:
                 .filter_by(close_id=close_id)
             )
             members = await session.execute(stmt)
-            members = [CloseMemberSchema.model_validate(
-                i) for i in members.scalars().all()]
+            members = [CloseMemberSchema.model_validate(i) for i in members.scalars().all()]
             return members
 
     async def delete_member(self, discord_id: int):
