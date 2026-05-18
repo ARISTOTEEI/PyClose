@@ -1,7 +1,7 @@
 import disnake as dis
 from disnake.ext.commands import Cog, Param, InteractionBot
 from disnake.ext import commands
-from disnake import PermissionOverwrite, Embed
+from disnake import PermissionOverwrite, Embed, ui
 from ..client import CloseBot
 from app.utils.schemas import CloseCreateSchema, CloseSchema, CloseUpdateSchema
 from disnake import ui
@@ -53,11 +53,9 @@ class CloseCommand(Cog):
                 await inter.edit_original_message("Успешно")
 
     @commands.slash_command(name="close", description="Create close Dota 2")
-    async def close_command(self, inter: dis.ApplicationCommandInteraction, type: str = Param(choices={"random": "random", "team": "team"})):
+    @commands.guild_only()
+    async def close_command(self, inter: dis.ApplicationCommandInteraction, type: str = Param(choices={"Рандом": "random", "По командам": "team"})):
         await inter.response.defer(with_message=True)
-        if not (inter.guild):
-            await inter.edit_original_message("Не используйте в личных сообщениях")
-            return
         closemod = inter.guild.get_role(self.bot.settings.roles.closemod)
 
         if closemod not in inter.author.roles:
@@ -162,7 +160,6 @@ class CloseCommand(Cog):
         message = await messagechannel.send(embed=message, components=row)
         close_data = CloseUpdateSchema(message=message.id)
         await self.bot.clm.update_close(close.id, close_data)
-
         message = Embed.from_dict(
             {
                 "title": "Dota 2 ・ Управление клозом ᅠ  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ",
@@ -196,7 +193,12 @@ class CloseCommand(Cog):
             label="Отменить",
             custom_id=f"closecancel.{close.id}"
         )
-        await managechannel.send(embed=message, components=row)
+        message = ui.Container(
+            ui.TextDisplay("# Dota 2 ・ Управление клозом \n**<:notification:1405557147487572120> - Уведомить о сборе на клоз\n\n<:freeiconbell8262174:1405557129171173628> - Позвать ребят на свободные позиции \n\n<:freeiconforbiddensign799546:1405559920484552877> - Удалить игрока из записи \n\n<:freeiconarrow11917347:1405557093968121856> - Запустить клоз\n\n<:freeiconmultiply6401653:1405557053618913320> - Отменить клоз**\n\n**Dota 2 ・Вспомогательные команды**\n\n/swap - заменить игрока или поменять местами игроков"),
+            ui.Separator(),
+            row
+            )
+        await managechannel.send(components=message)
         await inter.edit_original_message("Клоз создан")
 
     @commands.slash_command(name="removeclose")

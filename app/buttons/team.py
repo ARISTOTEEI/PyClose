@@ -1,6 +1,7 @@
 import disnake as dis
 from disnake.ext import commands
 from disnake.ext.commands import Cog
+from disnake import ui
 from app.client import CloseBot
 from app.entryMessage import update_message
 from app.utils.schemas import *
@@ -22,7 +23,6 @@ class TeamButton(Cog):
             embed = dis.Embed(title="Выбери позицию")
             row = dis.ui.ActionRow.with_message_components()
             members = await self.bot.clm.get_members(int(close_id))
-
             row.add_button(
                 style=dis.ButtonStyle.grey,
                 custom_id=f"pos.1.{team}.{close_id}",
@@ -58,7 +58,57 @@ class TeamButton(Cog):
                 disabled=next((True for x in members if x.pos ==
                               5 and x.team == team), False)
             )
-            await inter.response.send_message(components=row, embed=embed, ephemeral=True)
+            container = ui.Container(
+                ui.TextDisplay("# Выберите роль"),
+                ui.Separator(),
+                ui.Section(
+                ui.TextDisplay("Легкая"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.grey,
+                    custom_id=f"pos.1.{team}.{close_id}",
+                    emoji=self.bot.settings.emojis.Knife,
+                    disabled=next((True for x in members if x.pos ==
+                                1 and x.team == team), False)
+                )),
+                ui.Section(
+                ui.TextDisplay("Центр"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.grey,
+                    custom_id=f"pos.2.{team}.{close_id}",
+                    emoji=self.bot.settings.emojis.Onion,
+                    disabled=next((True for x in members if x.pos ==
+                                2 and x.team == team), False)                    
+                )),
+                ui.Section(
+                ui.TextDisplay("Сложная"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.grey,
+                    custom_id=f"pos.3.{team}.{close_id}",
+                    emoji=self.bot.settings.emojis.Security,
+                    disabled=next((True for x in members if x.pos ==
+                                3 and x.team == team), False)
+                )),
+                ui.Section(
+                ui.TextDisplay("Частичная поддержка"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.grey,
+                    custom_id=f"pos.4.{team}.{close_id}",
+                    emoji=self.bot.settings.emojis.Conhand,
+                    disabled=next((True for x in members if x.pos ==
+                                4 and x.team == team), False)
+                )),
+                ui.Section(
+                ui.TextDisplay("Полная поддержка"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.grey,
+                    custom_id=f"pos.5.{team}.{close_id}",
+                    emoji=self.bot.settings.emojis.Conhands,
+                    disabled=next((True for x in members if x.pos ==
+                                5 and x.team == team), False)
+                )),
+                ui.Separator()
+            )
+            await inter.response.send_message(components=container,ephemeral=True)
         if button == "pos":
             member = await self.bot.clm.get_member(inter.author.id)
             close_id = raw_data[-1]
@@ -79,7 +129,10 @@ class TeamButton(Cog):
             embed = await update_message(self.bot, int(close_id))
             message = await inter.guild.get_channel(close.messagechannel).fetch_message(close.message)
             await message.edit(embed=embed)
-            await inter.response.edit_message("Вы успешно записались!!!", components=[], embed=None)
+            container = ui.Container(
+                ui.TextDisplay("## Вы успешно записались"),
+            )
+            await inter.response.edit_message(components=container, embed=None)
 
 
 def setup(bot: CloseBot):

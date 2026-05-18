@@ -19,7 +19,9 @@ class CloseBot(InteractionBot):
 
     async def on_ready(self):
         print(f"Bot {self.user.display_name} is online!")
-        await self.change_presence(activity=dis.Game(f"with {self.owner.name}"), status=dis.Status.idle)
+        info = await self.application_info()
+        owner = info.team.owner if info.owner.name.startswith("team") else info.owner
+        await self.change_presence(activity=dis.Game(f"with {owner.name}"), status=dis.Status.idle)
 
     async def on_button_click(self, inter: disnake.MessageInteraction):
         if inter.guild.get_role(self.settings.roles.closeban) in inter.author.roles:
