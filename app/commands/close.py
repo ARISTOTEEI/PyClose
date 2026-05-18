@@ -4,12 +4,53 @@ from disnake.ext import commands
 from disnake import PermissionOverwrite, Embed, ui
 from ..client import CloseBot
 from app.utils.schemas import CloseCreateSchema, CloseSchema, CloseUpdateSchema
-
+from disnake import ui
 
 class CloseCommand(Cog):
     def __init__(self, bot: CloseBot) -> None:
         self.bot = bot
         super().__init__()
+
+    @commands.slash_command(name="closemanager",description="Техническое управление клозом (доступно только создателю)")
+    @commands.is_owner()
+    async def technical_close_panel(self,inter:dis.AppCmdInter):
+        closes = await self.bot.clm.get_closes()
+        components = ui.Container(
+            ui.TextDisplay("Запущенные клозы")
+        )
+        for close in closes:
+            section = ui.Section(
+                ui.TextDisplay(f"{close.creator}"),
+                accessory=ui.Button(
+                    style=dis.ButtonStyle.red,
+                    label="Удалить",
+                    custom_id=f"deleteclose.{close.id}"
+                ))
+            components.children.append(section)
+        await inter.response.send_message(components=components)
+        
+    @commands.Cog.listener(dis.Event.button_click)
+    async def on_button_click(self,inter:dis.MessageInteraction):
+        if inter.component.custom_id.startswith("deleteclose"):
+            await inter.response.defer(with_message=True,ephemeral=False)
+            info = await self.bot.application_info()
+            owner = info.team.owner if info.owner.name.startswith("team") else info.owner
+            if inter.author.id == owner.id:
+                data = inter.component.custom_id.split(".")
+                close_id = data[-1]
+                close = await self.bot.clm.getCloseById(int(close_id))
+                for channel in (cat:= inter.guild.get_channel(close.managechannel).category).channels:
+                    await channel.delete()
+                await cat.delete()
+                await self.bot.clm.delete_close(close.creator)
+                components = inter.message.components
+                for component in components:
+                    for item in component.children:
+                        if hasattr(item,"children"):
+                            item.accessory.disabled = True
+                ciunt = ui.Container.from_component(components[0])              
+                await inter.message.edit(components=ciunt)
+                await inter.edit_original_message("Успешно")
 
     @commands.slash_command(name="close", description="Create close Dota 2")
     @commands.guild_only()
