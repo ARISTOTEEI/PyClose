@@ -1,21 +1,17 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel, Field
 from disnake import PartialEmoji
+from pydantic import BaseModel, Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 roles = {
     "closemod": 1160124199902396458,
     "closeban": 1160128387390636085,
-    "closenotify": 0
+    "closenotify": 1160124206177079357
 }
-
-for i,b in roles.items():
-    if b==0:
-        raise Exception(f"bad config {i} is {b}")
     
 channels = {
-    "log_channel": 0,
-    "notification_channel": 0,
-    "win_channel": 0
+    "log_channel": 1011561762417557576,
+    "notification_channel": 1011561762417557576,
+    "win_channel": 1011561762417557576
 }
 
 
@@ -30,11 +26,6 @@ emojis = {
     "dark": "🌑",
     "light": "🌕"
 }
-
-for i,b in emojis.items():
-    if b=="":
-        raise Exception(f"bad config {i} is '{b}' ")
-
 line = {
     "1": "Лёгкая",
     "2": "Центр",
@@ -48,13 +39,25 @@ class SRoles(BaseModel):
     closemod: int
     closeban: int
     closenotify: int
-
+    
+    @model_validator(mode="after")
+    def validate_roles(self) -> "SRoles":
+        for name,value in self:
+            if value == 0:
+                raise ValueError(f"Bad Config roles, {name} is {value}")
+        return self
 
 class SChannels(BaseModel):
     log_channel: int | None
     notification_channel: int
     win_channel: int
 
+    @model_validator(mode="after")
+    def validate_channels(self) -> "SChannels":
+        for name,value in self:
+            if value == 0:
+                raise ValueError(f"Bad Config channels, {name} is {value}")
+        return self
 
 class SEmojis(BaseModel):
     Knife: str
@@ -65,6 +68,12 @@ class SEmojis(BaseModel):
     dark: str
     light: str
 
+    @model_validator(mode="after")
+    def validate_emojis(self) -> "SEmojis":
+        for name,value in self:
+            if value == "":
+                raise ValueError(f"Bad Config channels, {name} is {value}")
+        return self
 
 class Settings(BaseSettings):
     DB_USER: str
@@ -78,8 +87,7 @@ class Settings(BaseSettings):
     emojis: SEmojis = Field(default=SEmojis(**emojis))
     line: dict = Field(default=line)
 
-    TOKEN: str = Field(
-        default="MTAwMjIyMTYxMTM4NDA2MjAyNA.GxZaXB.xdutByU6YRyolA36qqmH0wGPhRLj3R9JzZ94aI")
+    TOKEN: str
 
     @property
     def DATABASE_url_asyncpg(self):
