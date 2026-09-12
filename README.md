@@ -111,21 +111,6 @@ python main.py
 3. у бота есть права перемещать, отключать звук и исключать участников из голосовых каналов;
 4. бот добавлен на сервер с необходимыми intents.
 
-## Структура проекта
-
-```text
-main.py                 Точка входа
-app/client.py            Инициализация Discord-бота
-app/config.py            Настройки окружения и Discord
-app/commands/            Slash-команды
-app/buttons/             Обработчики кнопок клоза
-app/menu/                Меню управления клозом
-app/events/              Обработчики событий и ошибок
-app/utils/models.py      SQLAlchemy-модели
-app/utils/database.py    Подключение к PostgreSQL
-migration/               Миграции Alembic
-```
-
 ## Разработка
 
 Создание новой миграции после изменения моделей:
