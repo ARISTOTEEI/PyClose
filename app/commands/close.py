@@ -1,10 +1,12 @@
 import disnake as dis
-from disnake.ext.commands import Cog, Param, InteractionBot
+from disnake import Embed, PermissionOverwrite, ui
 from disnake.ext import commands
-from disnake import PermissionOverwrite, Embed, ui
+from disnake.ext.commands import Cog, InteractionBot, Param
+
+from app.utils.schemas import CloseCreateSchema, CloseUpdateSchema
+
 from ..client import CloseBot
-from app.utils.schemas import CloseCreateSchema, CloseSchema, CloseUpdateSchema
-from disnake import ui
+
 
 class CloseCommand(Cog):
     def __init__(self, bot: CloseBot) -> None:
@@ -51,6 +53,8 @@ class CloseCommand(Cog):
                 ciunt = ui.Container.from_component(components[0])              
                 await inter.message.edit(components=ciunt)
                 await inter.edit_original_message("Успешно")
+            else:
+                await inter.edit_original_message("Это не ваш клоз")
 
     @commands.slash_command(name="close", description="Create close Dota 2")
     @commands.guild_only()
@@ -62,7 +66,7 @@ class CloseCommand(Cog):
             await inter.edit_original_message("У вас нету роли клозмейкера")
             return
 
-        if (await self.bot.clm.getCloseByCreator(inter.author.id)):
+        if await self.bot.clm.getCloseByCreator(inter.author.id):
             await inter.edit_original_message("У вас уже запущен клоз")
             return
 
@@ -137,27 +141,78 @@ class CloseCommand(Cog):
                     ]
                 }
             )
+
+            row = dis.ui.ActionRow.with_message_components()
+            row.add_button(
+                style=dis.ButtonStyle.primary,
+                label='Силы тьмы',
+                emoji=self.bot.settings.emojis.dark,
+                custom_id=f"team.dark.{close.id}"
+            )
+            row.add_button(
+                style=dis.ButtonStyle.primary,
+                label="Силы света",
+                emoji=self.bot.settings.emojis.light,
+                custom_id=f"team.light.{close.id}"
+            )
+            row.add_button(
+                style=dis.ButtonStyle.danger,
+                label="Выйти из записи",
+                custom_id=f'closeexit.{close.id}'
+            )
+            message = await messagechannel.send(embed=message, components=row)
         else:
-            pass
-        row = dis.ui.ActionRow.with_message_components()
-        row.add_button(
-            style=dis.ButtonStyle.primary,
-            label='Силы тьмы',
-            emoji=self.bot.settings.emojis.dark,
-            custom_id=f"team.dark.{close.id}"
-        )
-        row.add_button(
-            style=dis.ButtonStyle.primary,
-            label="Силы света",
-            emoji=self.bot.settings.emojis.light,
-            custom_id=f"team.light.{close.id}"
-        )
-        row.add_button(
-            style=dis.ButtonStyle.danger,
-            label="Выйти из записи",
-            custom_id=f'closeexit.{close.id}'
-        )
-        message = await messagechannel.send(embed=message, components=row)
+            components = ui.Container(
+                ui.TextDisplay("# Dota 2 ・ Запись  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ"),
+                ui.Section(
+                    ui.TextDisplay(self.bot.settings.emojis.Knife),
+                    accessory=
+                    dis.ui.Button(
+                        label="Записатьтся",
+                        style=dis.ButtonStyle.green,
+                        custom_id=f"pos.1.random.{close.id}",
+                    )),
+                ui.Section(
+                    ui.TextDisplay(self.bot.settings.emojis.Onion),
+                    accessory=
+                    dis.ui.Button(
+                        label="Записатьтся",
+                        style=dis.ButtonStyle.green,
+                        custom_id=f"pos.2.random.{close.id}",
+                    )),
+                ui.Section(
+                    ui.TextDisplay(self.bot.settings.emojis.Security),
+                    accessory=
+                    dis.ui.Button(
+                        label="Записатьтся",
+                        style=dis.ButtonStyle.green,
+                        custom_id=f"pos.3.random.{close.id}",
+                    )),
+                ui.Section(
+                    ui.TextDisplay(self.bot.settings.emojis.Conhand),
+                    accessory=
+                    dis.ui.Button(
+                        label="Записатьтся",
+                        style=dis.ButtonStyle.green,
+                        custom_id=f"pos.4.random.{close.id}",
+                    )),
+                ui.Section(
+                    ui.TextDisplay(self.bot.settings.emojis.Conhands),
+                    accessory=
+                    dis.ui.Button(
+                        label="Записатьтся",
+                        style=dis.ButtonStyle.green,
+                        custom_id=f"pos.5.random.{close.id}",
+                    )),
+                accent_colour=dis.Colour.from_hex("#2F3136")
+            )
+            row = dis.ui.ActionRow.with_message_components()
+            row.add_button(
+                style=dis.ButtonStyle.danger,
+                label="Выйти из записи",
+                custom_id=f'closeexit.{close.id}'
+            )
+            message = await messagechannel.send(components=[components,row])       
         close_data = CloseUpdateSchema(message=message.id)
         await self.bot.clm.update_close(close.id, close_data)
         message = Embed.from_dict(
@@ -184,12 +239,12 @@ class CloseCommand(Cog):
             custom_id=f"closeremove.{close.id}"
         )
         row.add_button(
-            style=dis.ButtonStyle.primary,
+            style=dis.ButtonStyle.success,
             label="Начать",
             custom_id=f"closestart.{close.id}"
         )
         row.add_button(
-            style=dis.ButtonStyle.primary,
+            style=dis.ButtonStyle.red,
             label="Отменить",
             custom_id=f"closecancel.{close.id}"
         )
@@ -201,19 +256,19 @@ class CloseCommand(Cog):
         await managechannel.send(components=message)
         await inter.edit_original_message("Клоз создан")
 
-    @commands.slash_command(name="removeclose")
-    async def close_remove(self, inter: dis.AppCmdInter):
-        await inter.response.defer(with_message=True, ephemeral=True)
-        close = await self.bot.clm.getCloseByCreator(inter.author.id)
-        if close:
-            channel = inter.guild.get_channel(close.managechannel)
-            for channel in channel.category.channels:
-                await channel.delete()
-            await channel.category.delete()
-            await self.bot.clm.delete_close(close.creator)
-            await inter.edit_original_message("Успешно")
-        else:
-            await inter.edit_original_message("Нету каналов")
+    # @commands.slash_command(name="removeclose")
+    # @commands.default_member_permissions(administrator=True)
+    # async def close_remove(self, inter: dis.AppCmdInter):
+    #     await inter.response.defer(with_message=True, ephemeral=True)
+    #     close = await self.bot.clm.getCloseByCreator(inter.author.id)
+    #     if close:
+    #         for channel in inter.guild.get_channel(close.managechannel).category.channels:
+    #             await channel.delete()
+    #         await channel.category.delete()
+    #         await self.bot.clm.delete_close(close.creator)
+    #         await inter.edit_original_message("Успешно")
+    #     else:
+    #         await inter.edit_original_message("Нету каналов")
 
 
 def setup(bot: InteractionBot):

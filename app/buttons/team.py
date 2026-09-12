@@ -1,9 +1,10 @@
 import disnake as dis
+from disnake import ui
 from disnake.ext import commands
 from disnake.ext.commands import Cog
-from disnake import ui
+
 from app.client import CloseBot
-from app.entryMessage import update_message
+from app.entryMessage import update_message, update_v2_message
 from app.utils.schemas import *
 
 
@@ -110,6 +111,7 @@ class TeamButton(Cog):
             )
             await inter.response.send_message(components=container,ephemeral=True)
         if button == "pos":
+
             member = await self.bot.clm.get_member(inter.author.id)
             close_id = raw_data[-1]
             pos = raw_data[1]
@@ -123,16 +125,28 @@ class TeamButton(Cog):
                 )
                 await self.bot.clm.append_member(int(close_id), member)
             else:
-                await self.bot.clm.edit_member(inter.author.id, int(pos), team)
-
+                if not(member.pos == int(pos) and member.team == team):
+                    await self.bot.clm.edit_member(inter.author.id, int(pos), team)
+            
+            
+            
             close = await self.bot.clm.getCloseById(int(close_id))
-            embed = await update_message(self.bot, int(close_id))
             message = await inter.guild.get_channel(close.messagechannel).fetch_message(close.message)
-            await message.edit(embed=embed)
-            container = ui.Container(
+            good_container = ui.Container(
                 ui.TextDisplay("## Вы успешно записались"),
             )
-            await inter.response.edit_message(components=container, embed=None)
+            if team != 'random':    
+                embed = await update_message(self.bot, int(close_id))
+                await message.edit(embed=embed)
+
+                await inter.response.edit_message(components=good_container, embed=None)
+            else:
+                container = await update_v2_message(self.bot,int(close_id) ,close = close)
+                await message.edit(components=container,embed=None)
+
+                await inter.response.send_message(components=good_container,ephemeral=True)
+                
+                
 
 
 def setup(bot: CloseBot):
