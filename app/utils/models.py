@@ -12,6 +12,7 @@ class CloseType(str,Enum):
 class TeamType(str,Enum):
     DARK = 'dark'
     LIGHT = 'light'
+    RANDOM = 'random'
 
 class CloseORM(Base):
     __tablename__ = "close"

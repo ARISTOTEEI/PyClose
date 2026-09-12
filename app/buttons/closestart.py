@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 
 import disnake as dis
 from disnake import PermissionOverwrite
@@ -6,7 +7,31 @@ from disnake.ext import commands
 from disnake.ext.commands import Cog
 
 from app.client import CloseBot
-from app.entryMessage import shuffle_message
+from app.entryMessage import update_message
+from app.utils.schemas import CloseMemberSchema
+
+
+async def split_teams(players:list[CloseMemberSchema] ) -> tuple[list[CloseMemberSchema], list[CloseMemberSchema]]:
+    by_position = defaultdict(list)
+    for player in players:
+        by_position[player.pos].append(player)
+
+    team1, team2 = [], []
+    for position, group in by_position.items():
+        random.shuffle(group)
+
+        if len(group) >= 2:
+            team1.append(group[0])
+            team2.append(group[1])
+
+        if len(group) % 2 != 0:
+            extra_player = group[0]
+            if len(team1) <= len(team2):
+                team1.append(extra_player)
+            else:
+                team2.append(extra_player)
+
+    return team1, team2
 
 
 class CloseStartButton(Cog):
@@ -70,7 +95,12 @@ class CloseStartButton(Cog):
                             ]
                         )
                         message = await inter.guild.get_channel(close.messagechannel).fetch_message(close.message)
-                        cont = await shuffle_message(self.bot,close_id,close)
+                        team_1, team_2 = await split_teams(close.members)
+                        for member in team_1:
+                            await self.bot.clm.edit_member(member.discord_id,member.pos,member,'dark')
+                        for member in team_2:
+                            await self.bot.clm.edit_member(member.discord_id,member.pos,member,'light')
+                        cont = await update_message(self.bot,close_id)
                         await message.delete()
                         await message.channel.send(embed=cont,components=components)
 
@@ -164,11 +194,11 @@ class CloseStartButton(Cog):
                         )
                         await lobby.send(embed=embed, components=row)
                     else:
-                        await inter.response.edit_message("## Слишком мало участников")
+                        await inter.edit_original_response("## Слишком мало участников")
                 else:
-                    await inter.response.edit_message("## Вы не являетесь создателем клоза")
+                    await inter.edit_original_response("## Вы не являетесь создателем клоза")
             else:
-                await inter.response.edit_message("## Вы не являетесь клозмодом")
+                await inter.edit_original_response("## Вы не являетесь клозмодом")
                 
 
 

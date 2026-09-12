@@ -1,12 +1,14 @@
 import random
 
+from collections import defaultdict
+
 import disnake as dis
 from disnake import Embed, ui
 from disnake.ui import Container
 
 from app.client import CloseBot
 from app.utils.models import TeamType
-from app.utils.schemas import CloseSchema
+from app.utils.schemas import CloseSchema,CloseMemberSchema
 
 
 async def update_message(bot: CloseBot, close_id:int) -> Embed:
@@ -36,49 +38,6 @@ async def update_message(bot: CloseBot, close_id:int) -> Embed:
 #         ui.TextDisplay("# Dota 2 ・ Запись  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ"),
         
 #     )
-    
-async def shuffle_message(bot:CloseBot,close_id:int,close:CloseSchema = None):
-    if not(close):
-        close = await bot.clm.getCloseById(close_id)
-    pos_1:list[str] = [
-        f"<@{x.discord_id}>" for x in close.members if x.pos == 1
-    ]
-    pos_2:list[str] = [
-        f"<@{x.discord_id}>" for x in close.members if x.pos == 2
-    ]
-    pos_3:list[str] = [
-        f"<@{x.discord_id}>" for x in close.members if x.pos == 3
-    ]
-    pos_4:list[str] = [
-        f"<@{x.discord_id}>" for x in close.members if x.pos == 4
-    ]
-    pos_5:list[str] = [
-        f"<@{x.discord_id}>" for x in close.members if x.pos == 5
-    ]
-    random.shuffle(pos_1)
-    random.shuffle(pos_2)
-    random.shuffle(pos_3)
-    random.shuffle(pos_4)
-    random.shuffle(pos_5)
-    embed = Embed.from_dict(
-        {
-            "title": "Dota 2 ・ Запись  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ  ᅠ",
-            "color": 3092790,
-            "fields": [
-                {
-                    "name": "Силы тьмы",
-                            "value": f'{bot.settings.emojis.Knife}・{pos_1[0] if len(pos_1) >= 1 else "Лёгкая"} \n\n{bot.settings.emojis.Onion}・{pos_2[0] if len(pos_2) >= 1 else "Центр"} \n\n{bot.settings.emojis.Security}・{pos_3[0] if len(pos_3) >= 1 else "Сложная"} \n\n{bot.settings.emojis.Conhand}・{pos_4[0] if len(pos_4) >= 1 else "Частичная поддержка"} \n\n{bot.settings.emojis.Conhands}・{pos_5[0] if len(pos_5) >= 1 else "Полная поддержка"}',
-                    "inline": True
-                },
-                {
-                    "name": "Силы света",
-                            "value": f'{bot.settings.emojis.Knife}・{pos_1[1] if len(pos_1) > 1 else "Лёгкая"} \n\n{bot.settings.emojis.Onion}・{pos_2[1] if len(pos_2) > 1 else "Центр"} \n\n{bot.settings.emojis.Security}・{pos_3[1] if len(pos_3) > 1 else "Сложная"} \n\n{bot.settings.emojis.Conhand}・{pos_4[1] if len(pos_4) > 1 else "Частичная поддержка"} \n\n{bot.settings.emojis.Conhands}・{pos_5[0] if len(pos_5) > 1 else "Полная поддержка"}',
-                    "inline": True
-                }
-            ]
-        }
-    )
-    return embed
 
 async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None) -> list[Container,dis.ui.ActionRow]:
     if not(close):
