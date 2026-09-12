@@ -1,9 +1,11 @@
-from sqlalchemy import Identity,ForeignKey,BigInteger,text
-from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import mapped_column,Mapped
-from app.utils.database import Base
 from enum import Enum
+
+from sqlalchemy import BigInteger, ForeignKey, Identity
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.utils.database import Base
+
 
 class CloseType(str,Enum):
     TEAM = 'team'

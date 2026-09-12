@@ -60,7 +60,7 @@ class CloseManager:
             await session.execute(stmt)
             await session.commit()
 
-    async def get_closes(self) -> List[CloseSchema]:
+    async def get_closes(self) -> list[CloseSchema]:
         async with self.db() as session:
             stmt = (
                 select(CloseORM)
@@ -77,7 +77,7 @@ class CloseManager:
             session.add(member)
             await session.commit()
 
-    async def get_members(self, close_id: int) -> List[CloseMemberSchema]:
+    async def get_members(self, close_id: int) -> list[CloseMemberSchema]:
         async with self.db() as session:
             stmt = (
                 select(CloseMemberORM)

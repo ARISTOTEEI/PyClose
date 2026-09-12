@@ -1,10 +1,9 @@
-import disnake
 import disnake as dis
 from disnake.ext import commands
 from disnake.ext.commands import Cog
 
 from app.client import CloseBot
-from app.entryMessage import update_message
+from app.entrymessage import update_message
 
 
 class CloseKickSelect(Cog):

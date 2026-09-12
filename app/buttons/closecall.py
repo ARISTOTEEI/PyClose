@@ -22,8 +22,8 @@ class CloseCallButton(Cog):
                 close = await self.bot.clm.getCloseById(close_id)
                 if inter.author.id == close.creator:
                     await inter.response.defer(with_message=True, ephemeral=True)
-                    time = datetime.datetime.fromtimestamp(close.lastcall if close.lastcall != None else 0)
-                    now = datetime.datetime.now()
+                    time = datetime.datetime.fromtimestamp(close.lastcall if close.lastcall != None else 0)  # noqa: DTZ006
+                    now = datetime.datetime.now()  # noqa: DTZ005
                     timeout = datetime.timedelta(minutes=5)
                     if (now - time).total_seconds() >= timeout.total_seconds():
                         members = await self.bot.clm.get_members(close_id)

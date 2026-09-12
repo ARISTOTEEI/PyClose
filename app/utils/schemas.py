@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 from app.utils.models import CloseType, TeamType
@@ -44,8 +42,8 @@ class CloseCreateSchema(BaseModel):
     message: int | None = None
 
 class CloseUpdateSchema(BaseModel):
-    lastcall: Optional[int] = None
-    message: Optional[int] = None
+    lastcall: int | None = None
+    message: int | None = None
 
 class UserSchema(BaseModel):
     userid:int

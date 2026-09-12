@@ -1,9 +1,9 @@
 import disnake as dis
-
-from disnake.ext.commands import Cog
 from disnake.ext import commands
+from disnake.ext.commands import Cog
 
 from app.client import CloseBot
+
 
 class PingCommand(Cog):
     def __init__(self,bot:CloseBot):

@@ -7,7 +7,7 @@ from disnake.ext import commands
 from disnake.ext.commands import Cog
 
 from app.client import CloseBot
-from app.entryMessage import update_message
+from app.entrymessage import update_message
 from app.utils.schemas import CloseMemberSchema
 
 
@@ -17,7 +17,7 @@ async def split_teams(players:list[CloseMemberSchema] ) -> tuple[list[CloseMembe
         by_position[player.pos].append(player)
 
     team1, team2 = [], []
-    for position, group in by_position.items():
+    for pos, group in by_position.items():  # noqa: PERF102
         random.shuffle(group)
 
         if len(group) >= 2:
@@ -96,10 +96,12 @@ class CloseStartButton(Cog):
                         )
                         message = await inter.guild.get_channel(close.messagechannel).fetch_message(close.message)
                         team_1, team_2 = await split_teams(close.members)
-                        for member in team_1:
-                            await self.bot.clm.edit_member(member.discord_id,member.pos,member,'dark')
-                        for member in team_2:
-                            await self.bot.clm.edit_member(member.discord_id,member.pos,member,'light')
+                        if team_1:
+                            for member in team_1:
+                                await self.bot.clm.edit_member(member.discord_id,member.pos,'dark')
+                        if team_2:
+                            for member in team_2:
+                                await self.bot.clm.edit_member(member.discord_id,member.pos,'light')
                         cont = await update_message(self.bot,close_id)
                         await message.delete()
                         await message.channel.send(embed=cont,components=components)

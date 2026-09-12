@@ -1,11 +1,9 @@
-import disnake
 import disnake as dis
 from disnake.ext import commands
 from disnake.ext.commands import Cog
 
 from app.client import CloseBot
-from app.entryMessage import update_message
-from app.utils.schemas import UserSchema, TeamType
+from app.utils.schemas import TeamType, UserSchema
 
 
 class CloseWinnerSelect(Cog):

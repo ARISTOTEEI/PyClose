@@ -1,14 +1,10 @@
-import random
-
-from collections import defaultdict
-
 import disnake as dis
 from disnake import Embed, ui
 from disnake.ui import Container
 
 from app.client import CloseBot
 from app.utils.models import TeamType
-from app.utils.schemas import CloseSchema,CloseMemberSchema
+from app.utils.schemas import CloseSchema
 
 
 async def update_message(bot: CloseBot, close_id:int) -> Embed:
@@ -68,7 +64,7 @@ async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None)
                 label="Записатьтся",
                 style=dis.ButtonStyle.green,
                 custom_id=f"pos.1.random.{close.id}",
-                disabled=True if len(pos_1) == 2 else False
+                disabled=True if len(pos_1) == 2 else False  # noqa: SIM210
             )),
         ui.Section(
             ui.TextDisplay(bot.settings.emojis.Onion + "   " + ",".join(pos_2)),
@@ -77,7 +73,7 @@ async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None)
                 label="Записатьтся",
                 style=dis.ButtonStyle.green,
                 custom_id=f"pos.2.random.{close.id}",
-                disabled=True if len(pos_2) == 2 else False
+                disabled=True if len(pos_2) == 2 else False  # noqa: SIM210
             )),
         ui.Section(
             ui.TextDisplay(bot.settings.emojis.Security + "   " + ",".join(pos_3)),
@@ -86,7 +82,7 @@ async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None)
                 label="Записатьтся",
                 style=dis.ButtonStyle.green,
                 custom_id=f"pos.3.random.{close.id}",
-                disabled=True if len(pos_3) == 2 else False
+                disabled=True if len(pos_3) == 2 else False  # noqa: SIM210
             )),
         ui.Section(
             ui.TextDisplay(bot.settings.emojis.Conhand + "   " + ",".join(pos_4)),
@@ -95,7 +91,7 @@ async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None)
                 label="Записатьтся",
                 style=dis.ButtonStyle.green,
                 custom_id=f"pos.4.random.{close.id}",
-                disabled=True if len(pos_4) == 2 else False
+                disabled=True if len(pos_4) == 2 else False  # noqa: SIM210
             )),
         ui.Section(
             ui.TextDisplay(bot.settings.emojis.Conhands + "   " + ",".join(pos_5)),
@@ -104,7 +100,7 @@ async def update_v2_message(bot:CloseBot,close_id:int, close:CloseSchema = None)
                 label="Записатьтся",
                 style=dis.ButtonStyle.green,
                 custom_id=f"pos.5.random.{close.id}",
-                disabled=True if len(pos_5) == 2 else False
+                disabled=True if len(pos_5) == 2 else False  # noqa: SIM210
             )),
         accent_colour=dis.Colour.from_hex("#2F3136")
             )
