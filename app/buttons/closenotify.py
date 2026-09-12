@@ -50,14 +50,13 @@ class CloseNotifyButton(Cog):
                             }
                         }
                     )
-                    role = inter.guild.get_role(
-                        self.bot.settings.roles.closenotify)
+                    role = inter.guild.get_role(self.bot.settings.roles.closenotify)
                     await inter.guild.get_channel(self.bot.settings.channels.notification_channel).send(role.mention, embed=embed)
-                    await inter.response.send_message("Вы успешно отпраили уведомление", ephemeral=True)
+                    await inter.response.send_message("## Вы успешно отпраили уведомление", ephemeral=True)
                 else:
-                    await inter.response.send_message("Вы не создатель клоза", ephemeral=True)
+                    await inter.response.send_message("## Вы не являетесь создателем клоза", ephemeral=True)
             else:
-                await inter.response.send_message("Вы не являетесь клозмодом", ephemeral=True)
+                await inter.response.send_message("## Вы не являетесь клозмодом", ephemeral=True)
 
 
 def setup(bot: CloseBot):

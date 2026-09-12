@@ -1,7 +1,8 @@
 import disnake as dis
 from disnake.ext import commands
-import disnake
+
 from ..client import CloseBot
+
 
 class ErrorEvent(commands.Cog):
     def __init__(self,bot:CloseBot):

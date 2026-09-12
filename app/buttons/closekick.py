@@ -1,5 +1,4 @@
 import disnake as dis
-import disnake
 from disnake.ext import commands
 from disnake.ext.commands import Cog
 
@@ -38,11 +37,11 @@ class CloseKickButton(Cog):
                             )
                         await inter.edit_original_message(components=[select])
                     else:
-                        await inter.edit_original_message("## Нету участников клоза")
+                        await inter.edit_original_message("## Слишком мало участников")
                 else:
-                    await inter.edit_original_message("## Вы не создатель клоза")
+                    await inter.edit_original_message("## Вы не являетесь создателем клоза")
             else:
-                await inter.edit_original_message("## Вы не клозмод")
+                await inter.edit_original_message("## Вы не являетесь клозмодом")
 
 
 def setup(bot: CloseBot):

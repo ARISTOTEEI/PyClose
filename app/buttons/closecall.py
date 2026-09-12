@@ -1,10 +1,11 @@
+import datetime
+
 import disnake as dis
 from disnake.ext import commands
 from disnake.ext.commands import Cog
-import datetime
 
-from app.utils.schemas import CloseUpdateSchema
 from app.client import CloseBot
+from app.utils.schemas import CloseUpdateSchema
 
 
 class CloseCallButton(Cog):
@@ -21,8 +22,7 @@ class CloseCallButton(Cog):
                 close = await self.bot.clm.getCloseById(close_id)
                 if inter.author.id == close.creator:
                     await inter.response.defer(with_message=True, ephemeral=True)
-                    time = datetime.datetime.fromtimestamp(
-                        close.lastcall if close.lastcall != None else 0)
+                    time = datetime.datetime.fromtimestamp(close.lastcall if close.lastcall != None else 0)
                     now = datetime.datetime.now()
                     timeout = datetime.timedelta(minutes=5)
                     if (now - time).total_seconds() >= timeout.total_seconds():
@@ -43,9 +43,9 @@ class CloseCallButton(Cog):
                     else:
                         await inter.edit_original_message("## Вы не можете звать людей на клоз чаще чем раз в 5 минут.")
                 else:
-                    await inter.response.send_message("Вы не создатель клоза", ephemeral=True)
+                    await inter.response.send_message("## Вы не являетесь создателем клоза", ephemeral=True)
             else:
-                await inter.response.send_message("Вы не являетесь клозмодом", ephemeral=True)
+                await inter.response.send_message("## Вы не являетесь клозмодом", ephemeral=True)
 
 
 def setup(bot: CloseBot):

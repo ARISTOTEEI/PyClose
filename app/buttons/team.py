@@ -17,7 +17,7 @@ class TeamButton(Cog):
     async def on_button_click(self, inter: dis.MessageInteraction):
         component = inter.component
         raw_data = component.custom_id.split('.')
-        button = raw_data[0]
+        button = raw_data[0] # team.{teamtype}.{closeid}
         if button == "team":
             team = raw_data[1]
             close_id = raw_data[-1]

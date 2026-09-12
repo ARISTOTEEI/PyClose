@@ -1,6 +1,9 @@
-from pydantic import BaseModel,Field
-from app.utils.models import CloseType,TeamType
-from typing import List,Optional
+from typing import Optional
+
+from pydantic import BaseModel
+
+from app.utils.models import CloseType, TeamType
+
 
 class CloseMemberSchema(BaseModel):
     id:int | None = None

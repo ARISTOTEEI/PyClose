@@ -1,8 +1,9 @@
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from sqlalchemy import update, select, insert, delete
-from app.utils.schemas import *
-from app.utils.models import CloseORM, CloseMemberORM, UserORM
 from pydantic import ValidationError
+from sqlalchemy import delete, insert, select, update
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from app.utils.models import CloseMemberORM, CloseORM, UserORM
+from app.utils.schemas import *
 
 
 class CloseManager:
@@ -31,7 +32,7 @@ class CloseManager:
             close = await session.execute(stmt)
             try:
                 close = CloseSchema.model_validate(close.scalar_one_or_none())
-            except Exception:
+            except ValidationError:
                 close = None
             return close
 

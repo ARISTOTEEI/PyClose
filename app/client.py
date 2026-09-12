@@ -1,8 +1,11 @@
-import disnake as dis
 import disnake
+import disnake as dis
 from disnake.ext.commands import InteractionBot
-from app.config import settings
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.closemanager import CloseManager
+from app.config import settings
 from app.utils.database import async_session
 
 
@@ -16,6 +19,13 @@ class CloseBot(InteractionBot):
         self.load_extensions(r"app\events")
         self.load_extensions(r"app\buttons")
         self.load_extensions(r"app\menu")
+
+    async def on_connect(self):
+        try:
+            async with async_session() as session:
+                await session.execute(text("SELECT 1"))
+        except SQLAlchemyError as ex:
+            print(ex)
 
     async def on_ready(self):
         print(f"Bot {self.user.display_name} is online!")
