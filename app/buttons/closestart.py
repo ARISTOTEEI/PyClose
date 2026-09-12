@@ -47,11 +47,13 @@ class CloseStartButton(Cog):
             close_id = int(raw_data[-1])
             close = await self.bot.clm.getCloseById(close_id)
             members = await self.bot.clm.get_members(close_id)
+            info = await self.bot.application_info()
+            owner = info.team.owner if info.owner.name.startswith("team") else info.owner
             if inter.guild.get_role(self.bot.settings.roles.closemod) in inter.author.roles:
                 
                 if close.creator == inter.author.id:
                     
-                    if (2 <= len(members) <= 10) or close.creator == 745562614930604073:
+                    if (2 <= len(members) <= 10) or close.creator == owner.id:
                         
                         await inter.edit_original_message("## Клоз запущен")
                         
