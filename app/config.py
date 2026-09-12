@@ -1,4 +1,3 @@
-from disnake import PartialEmoji
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
